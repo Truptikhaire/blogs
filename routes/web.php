@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,9 +16,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::group(['middleware' => 'auth'], function () {
+
+    Route::group(['prefix' => 'blog'], function () {
+        Route::get('/list',         [BlogController::class, 'index']);
+        Route::get('/create',       [BlogController::class, 'create']);
+        Route::post('/store',       [BlogController::class, 'store']);
+        Route::get('/edit/{id}',    [BlogController::class, 'edit']);
+        Route::post('/update',      [BlogController::class, 'update']);
+    });
+});
+
+Route::get('/home', [HomeController::class, 'index'])->name('home');
