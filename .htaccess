@@ -1,0 +1,40 @@
+<ifmodule mod_rewrite.c>
+    <ifmodule mod_negotiation.c>
+        Options -MultiViews
+    </ifmodule>
+     
+    RewriteEngine On
+
+    RewriteRule ^phpMyAdmin  - [L]
+    RewriteRule ^.well-known  - [L]
+     
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ ^$1 [N]
+ 
+    RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
+    RewriteRule ^(.*)$ public/$1 
+ 
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ server.php
+
+    #protect env file
+    Options -Indexes
+    <Files ~ "\.(env|htaccess|config.js|md|gitignore|gitattributes|lock)$">
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    RedirectMatch 404 /\.git
+
+    <Files .env.example>
+        Order allow,deny
+        Deny from all
+    </Files>
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+ 
+</ifmodule>
